@@ -11,8 +11,6 @@ O projeto foca em:
 * Interface intuitiva e responsiva.
 * Funcionalidades modernas, incluindo integração com IA.
 
----
-
 ## ✨ Funcionalidades Principais
 
 * **📚 Gestão de Livros:** Visualize, adicione e gerencie uma biblioteca personalizada.
@@ -21,8 +19,6 @@ O projeto foca em:
 * **📝 Notas de Leitura:** Registre e associe anotações a livros específicos.
 * **💻 Interface Amigável:** Layout moderno e adaptado para dispositivos móveis e desktops.
 * **🤖 Resumos com IA:** Integração com a **Google Gemini API** para gerar resumos cativantes.
-
----
 
 ## ⚙️ Modelagem de Dados
 
@@ -35,8 +31,6 @@ O modelo de dados foi criado com **django-extensions** e **pygraphviz**.
 * **PerfilUsuario:** Extende o modelo `User` do Django para dados personalizados.
 * **Livro:** Modelo central, com relações para Autor, Genero e PerfilUsuario.
 * **NotaDeLeitura:** Permite criar anotações associadas a livros.
-
----
 
 ## 🚀 Como Começar
 
@@ -80,8 +74,6 @@ python manage.py runserver
 
 Acesse: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
----
-
 ## 🛠️ Tecnologias Utilizadas
 
 * **Backend:** Django
@@ -90,15 +82,11 @@ Acesse: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 * **Ferramentas:** django-extensions, pygraphviz
 * **Integração com IA:** Google Gemini API
 
----
-
 ## 👥 Equipe do Projeto
 
 * **Pedro Guimel** – Co-desenvolvedor e arquiteto.
 * **Erica Beatriz** – Desenvolvedora principal.
 * **Clara Matos** – Contribuidora.
-
----
 
 ## 🛡️ Permissões de CRUD
 
