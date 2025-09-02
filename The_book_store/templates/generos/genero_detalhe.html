@@ -1,0 +1,106 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Cabeçalho com ações -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'generos:lista_generos' %}" class="text-decoration-none">Gêneros</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Detalhes</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 fw-bold text-primary">{{ genero.nome }}</h1>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'generos:editar_genero' genero.pk %}" class="btn btn-outline-primary rounded-pill">
+                        <i class="bi bi-pencil me-2"></i>Editar
+                    </a>
+                    <a href="{% url 'generos:deletar_genero' genero.pk %}" class="btn btn-outline-danger rounded-pill">
+                        <i class="bi bi-trash me-2"></i>Excluir
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card de detalhes -->
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="h5 fw-bold text-secondary mb-3">Informações do Gênero</h3>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-muted mb-1">Nome do Gênero</label>
+                                <p class="fs-5 text-dark">{{ genero.nome }}</p>
+                            </div>
+
+                            {% if genero.descricao %}
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-muted mb-1">Descrição</label>
+                                <p class="text-dark">{{ genero.descricao }}</p>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-muted mb-1">Data de Criação</label>
+                                <p class="text-dark">{{ genero.data_criacao|date:"d/m/Y H:i" }}</p>
+                            </div>
+
+                            {% if genero.data_atualizacao %}
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-muted mb-1">Última Atualização</label>
+                                <p class="text-dark">{{ genero.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="bg-light p-4 rounded-3">
+                                <h4 class="h6 fw-bold text-secondary mb-3">Estatísticas</h4>
+                                
+                                {% if genero.livro_set.all %}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-muted mb-1">Total de Livros</label>
+                                    <p class="fs-4 fw-bold text-primary">{{ genero.livro_set.count }}</p>
+                                </div>
+
+                                <div>
+                                    <label class="form-label fw-semibold text-muted mb-2">Livros deste Gênero</label>
+                                    <div class="list-group list-group-flush">
+                                        {% for livro in genero.livro_set.all|slice:":5" %}
+                                        <a href="#" class="list-group-item list-group-item-action border-0 px-0 py-2">
+                                            <small>{{ livro.titulo }}</small>
+                                        </a>
+                                        {% endfor %}
+                                        {% if genero.livro_set.count > 5 %}
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">+{{ genero.livro_set.count|add:"-5" }} outros</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-3">
+                                    <i class="bi bi-book text-muted" style="font-size: 2rem;"></i>
+                                    <p class="text-muted mt-2 mb-0">Nenhum livro encontrado</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão de voltar -->
+            <div class="text-center mt-4">
+                <a href="{% url 'generos:lista_generos' %}" class="btn btn-outline-secondary rounded-pill">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar para Lista
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

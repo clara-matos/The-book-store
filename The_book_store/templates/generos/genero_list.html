@@ -1,0 +1,28 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 fw-bold text-primary">Gêneros</h1>
+        <a href="{% url 'generos:adicionar_genero' %}" class="btn btn-primary rounded-pill shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i>Adicionar Gênero
+        </a>
+    </div>
+
+    {% if generos %}  <!-- CORRIGIDO: object_list → generos -->
+    <div class="list-group">
+        {% for genero in generos %}  <!-- CORRIGIDO: object_list → generos -->
+        <a href="{% url 'generos:detalhe_genero' genero.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
+            <span>{{ genero.nome }}</span>
+            <small class="text-muted">{{ genero.descricao }}</small>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center p-5 border rounded-3 bg-light">
+        <p class="lead text-muted">Ainda não há gêneros cadastrados.</p>
+        <a href="{% url 'generos:adicionar_genero' %}" class="btn btn-primary mt-3 rounded-pill shadow-sm">Adicionar Gênero</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

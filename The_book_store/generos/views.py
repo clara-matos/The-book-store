@@ -1,9 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from .models import Genero
-from .forms import GeneroForm # Importando o formulário para a criação/edição
-
-# Views para a app Generos usando funções
+from .forms import GeneroForm
 
 def genero_list(request):
     """
@@ -29,7 +27,7 @@ def adicionar_genero(request):
         form = GeneroForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(reverse('generos:genero_list'))
+            return redirect(reverse('generos:lista_generos'))  # CORRIGIDO
     else:
         form = GeneroForm()
     
@@ -45,7 +43,7 @@ def editar_genero(request, pk):
         form = GeneroForm(request.POST, instance=genero)
         if form.is_valid():
             form.save()
-            return redirect(reverse('generos:genero_list'))
+            return redirect(reverse('generos:lista_generos'))  # CORRIGIDO
     else:
         form = GeneroForm(instance=genero)
         
@@ -59,7 +57,7 @@ def deletar_genero(request, pk):
     genero = get_object_or_404(Genero, pk=pk)
     if request.method == 'POST':
         genero.delete()
-        return redirect(reverse('generos:genero_list'))
+        return redirect(reverse('generos:lista_generos'))  # CORRIGIDO
         
     context = {'genero': genero}
     return render(request, 'generos/genero_confirm_delete.html', context)

@@ -3,9 +3,7 @@ from django.urls import reverse
 from .models import Livro, Autor, Genero
 from .forms import LivroForm # Precisamos criar este formulário em um arquivo `forms.py`
 
-# Views para a app Livros usando funções
-
-def index(request):
+def listar_livros(request):
     """
     Exibe uma lista de todos os livros.
     Equivale à função `index` do seu urls.py.
