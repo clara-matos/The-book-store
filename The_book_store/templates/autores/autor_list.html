@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">Lista de Autores</h1>
+            <a href="{% url 'autores:adicionar_autor' %}" class="btn btn-primary rounded-pill">Adicionar Novo Autor</a>
+        </div>
+
+        {% if autores %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover rounded-3 overflow-hidden shadow-sm">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">País</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for autor in autores %}
+                    <tr>
+                        <td><a href="{% url 'autores:autor_detalhe' pk=autor.pk %}">{{ autor.nome }}</a></td>
+                        <td>{{ autor.pais }}</td>
+                        <td>
+                            <a href="{% url 'autores:editar_autor' pk=autor.pk %}" class="btn btn-sm btn-outline-info rounded-pill">Editar</a>
+                            <a href="{% url 'autores:deletar_autor' pk=autor.pk %}" class="btn btn-sm btn-outline-danger rounded-pill">Deletar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Nenhum autor cadastrado. Adicione um para começar!
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

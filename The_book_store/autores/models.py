@@ -5,7 +5,8 @@ class Autor(models.Model):
     Modelo para representar os autores dos livros.
     """
     nome = models.CharField(max_length=100, verbose_name="Nome")
-    pais = models.CharField(max_length=100, verbose_name="País")
+    pais = models.CharField(max_length=100, verbose_name="País", blank=True, null=True)
+    biografia = models.TextField(verbose_name="Biografia", blank=True, null=True)
 
     class Meta:
         verbose_name = "Autor"

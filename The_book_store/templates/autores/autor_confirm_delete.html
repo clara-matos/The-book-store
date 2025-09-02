@@ -1,0 +1,26 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm rounded-4">
+                    <div class="card-body p-4 text-center">
+                        <h1 class="card-title fw-bold mb-4 text-danger">Confirmar Exclusão</h1>
+                        <p class="lead">Tem certeza de que deseja deletar o autor <strong>{{ autor.nome }}</strong>?</p>
+                        <p class="text-muted">Esta ação não pode ser desfeita.</p>
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger btn-lg rounded-pill">Deletar</button>
+                                <a href="{% url 'autores:autor_list' %}" class="btn btn-outline-secondary btn-lg rounded-pill">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

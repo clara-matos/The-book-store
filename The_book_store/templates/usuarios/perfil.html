@@ -1,0 +1,38 @@
+{% extends '_base.html' %}
+
+{% block title %}Perfil de Usuário{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h1 class="card-title mb-4">Bem-vindo(a), {{ user.username }}!</h1>
+            <p class="card-text text-muted">Este é o seu perfil.</p>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Informações da Conta</h5>
+                            <p class="card-text">
+                                **Nome de Usuário:** {{ user.username }} <br>
+                                **Email:** {{ user.email }} <br>
+                                **Membro desde:** {{ user.date_joined|date:"d/m/Y" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Ações</h5>
+                            <a href="{% url 'usuarios:password_change' %}" class="btn btn-primary my-2 w-100">Alterar Senha</a>
+                            <a href="{% url 'usuarios:logout' %}" class="btn btn-danger my-2 w-100">Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
