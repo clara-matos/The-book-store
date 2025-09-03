@@ -1,5 +1,7 @@
 {% extends '_base.html' %}
 
+{% block title %}Meu Perfil{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="text-center mb-5">
@@ -34,14 +36,10 @@
             <div class="card h-100 shadow-sm rounded-4 p-4">
                 <h5 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Informações</h5>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between"><strong>Usuário</strong> {{ user.username
-                        }}</li>
-                    <li class="list-group-item d-flex justify-content-between"><strong>Email</strong> {{ user.email }}
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between"><strong>Biografia</strong> {{
-                        user.perfil.biografia|default:"Não informada" }}</li>
-                    <li class="list-group-item d-flex justify-content-between"><strong>Nascimento</strong> {{
-                        user.perfil.data_nascimento|date:"d/m/Y"|default:"Não informada" }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Usuário</strong> {{ user.username }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Email</strong> {{ user.email }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Biografia</strong> {{ user.perfil.biografia|default:"Não informada" }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Nascimento</strong> {{ user.perfil.data_nascimento|date:"d/m/Y"|default:"Não informada" }}</li>
                 </ul>
             </div>
         </div>
@@ -55,8 +53,7 @@
                 {% if livros_na_lista %}
                 <div class="d-flex flex-wrap gap-2">
                     {% for livro in livros_na_lista %}
-                    <a href="{% url 'livros:detalhe_livro' livro.pk %}" class="badge bg-primary p-2 rounded-pill">{{
-                        livro.titulo }}</a>
+                    <a href="{% url 'livros:detalhe_livro' livro.pk %}" class="badge bg-primary p-2 rounded-pill">{{ livro.titulo }}</a>
                     {% endfor %}
                 </div>
                 {% else %}
@@ -75,11 +72,35 @@
         <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-lg rounded-pill">
             <i class="bi bi-box-arrow-right me-1"></i> Sair
         </a>
-        <a href="{% url 'usuarios:deletar_perfil' %}" class="btn btn-danger btn-lg rounded-pill">
+        {% if perms.usuarios.delete_perfilusuario %}
+        <button type="button" class="btn btn-danger btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
             <i class="bi bi-trash me-1"></i> Excluir Perfil
-        </a>
+        </button>
+        {% endif %}
     </div>
+</div>
 
+<!-- Modal de confirmação de exclusão -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger fw-bold" id="confirmDeleteLabel">Confirmar Exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="lead">Tem certeza que deseja excluir seu perfil e conta?</p>
+        <p class="text-muted">Esta ação é irreversível.</p>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+        <form method="post" action="{% url 'usuarios:deletar_perfil' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger rounded-pill">Confirmar Exclusão</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
