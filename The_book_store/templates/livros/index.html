@@ -8,12 +8,17 @@
         <p class="lead text-muted mb-4">Milhares de livros, autores e histórias aguardam por si.</p>
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
-                <div class="input-group input-group-lg shadow-sm rounded-pill">
-                    <span class="input-group-text bg-white border-end-0 rounded-start-pill pe-0" id="search-addon">
-                        <i class="bi bi-search text-muted fs-5"></i>
-                    </span>
-                    <input type="search" class="form-control border-start-0 rounded-end-pill ps-2" placeholder="Pesquisar por título, autor ou editora" aria-label="Search" aria-describedby="search-addon">
-                </div>
+                <!-- CORREÇÃO: Use o namespace correto 'livros:lista_livros' -->
+                <form method="GET" action="{% url 'livros:lista_livros' %}">
+                    <div class="input-group input-group-lg shadow-sm rounded-pill">
+                        <span class="input-group-text bg-white border-end-0 rounded-start-pill pe-0" id="search-addon">
+                            <i class="bi bi-search text-muted fs-5"></i>
+                        </span>
+                        <input type="search" name="q" class="form-control border-start-0 rounded-end-pill ps-2"
+                            placeholder="Pesquisar por título, autor ou editora" aria-label="Search"
+                            aria-describedby="search-addon">
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -24,108 +29,86 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold">Livros em Destaque</h3>
             <div class="d-flex gap-2">
+                <!-- CORREÇÃO: Use o namespace correto 'livros:lista_livros' -->
                 <a href="{% url 'livros:lista_livros' %}" class="btn btn-outline-primary rounded-pill">Ver Todos</a>
+                <!-- CORREÇÃO: Verifique se a URL 'autores' existe ou use o namespace correto -->
                 <a href="{% url 'autores:autor_list' %}" class="btn btn-outline-secondary rounded-pill">Ver Autores</a>
             </div>
         </div>
-        
+
+        {% if livros %}
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-            <!-- Simulação de um loop Django com dados de exemplo -->
-            {% for book in books %}
+            {% for livro in livros %}
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden book-card">
-                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text=Capa+do+Livro" class="card-img-top card-img-custom" alt="Capa de {{ book.titulo }}">
+                    {% if livro.capa %}
+                    <img src="{{ livro.capa.url }}" class="card-img-top card-img-custom"
+                        alt="Capa de {{ livro.titulo }}">
+                    {% else %}
+                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text={{ livro.titulo|urlencode }}"
+                        class="card-img-top card-img-custom" alt="Capa de {{ livro.titulo }}">
+                    {% endif %}
                     <div class="card-body d-flex flex-column justify-content-between">
                         <div>
-                            <h5 class="card-title fw-bold fs-5 mb-1">{{ book.titulo }}</h5>
-                            <p class="card-text text-muted small mb-2">{{ book.autor }}</p>
+                            <h5 class="card-title fw-bold fs-5 mb-1">{{ livro.titulo }}</h5>
+                            <p class="card-text text-muted small mb-2">{{ livro.autor.nome }}</p>
+                            {% if livro.genero %}
+                            <span class="badge bg-light text-dark small">{{ livro.genero.nome }}</span>
+                            {% endif %}
                         </div>
                         <div class="mt-auto d-grid gap-2">
-                            <button class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar à Lista</button>
+                            <!-- CORREÇÃO: Use o namespace correto 'livros:detalhe_livro' -->
+                            <a href="{% url 'livros:detalhe_livro' livro.pk %}"
+                                class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</a>
+                            {% if user.is_authenticated %}
+                            {% if livro.usuario == user.perfil %}
+                            <span class="badge bg-success rounded-pill">Na sua lista</span>
+                            {% else %}
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill" disabled>
+                                Adicionar à Lista
+                            </button>
+                            {% endif %}
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar
+                                à Lista</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
-
-            <!-- Cards de exemplo para preencher o layout -->
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden book-card">
-                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text=Capa+do+Livro" class="card-img-top card-img-custom" alt="Capa do Livro 1">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="card-title fw-bold fs-5 mb-1">O Essencialismo</h5>
-                            <p class="card-text text-muted small mb-2">Greg McKeown</p>
-                        </div>
-                        <div class="mt-auto d-grid gap-2">
-                            <button class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar à Lista</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden book-card">
-                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text=Capa+do+Livro" class="card-img-top card-img-custom" alt="Capa do Livro 2">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="card-title fw-bold fs-5 mb-1">A Sutil Arte de Ligar o F*da-se</h5>
-                            <p class="card-text text-muted small mb-2">Mark Manson</p>
-                        </div>
-                        <div class="mt-auto d-grid gap-2">
-                            <button class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar à Lista</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden book-card">
-                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text=Capa+do+Livro" class="card-img-top card-img-custom" alt="Capa do Livro 3">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="card-title fw-bold fs-5 mb-1">O Diário de Anne Frank</h5>
-                            <p class="card-text text-muted small mb-2">Anne Frank</p>
-                        </div>
-                        <div class="mt-auto d-grid gap-2">
-                            <button class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar à Lista</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden book-card">
-                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text=Capa+do+Livro" class="card-img-top card-img-custom" alt="Capa do Livro 4">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="card-title fw-bold fs-5 mb-1">Cem Anos de Solidão</h5>
-                            <p class="card-text text-muted small mb-2">Gabriel García Márquez</p>
-                        </div>
-                        <div class="mt-auto d-grid gap-2">
-                            <button class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar à Lista</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden book-card">
-                    <img src="https://placehold.co/300x400/F5EFE1/78716c?text=Capa+do+Livro" class="card-img-top card-img-custom" alt="Capa do Livro 5">
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="card-title fw-bold fs-5 mb-1">O Alquimista</h5>
-                            <p class="card-text text-muted small mb-2">Paulo Coelho</p>
-                        </div>
-                        <div class="mt-auto d-grid gap-2">
-                            <button class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-pill">Adicionar à Lista</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-book fs-1 text-muted"></i>
+            </div>
+            <h4 class="text-muted">Nenhum livro cadastrado ainda</h4>
+            <p class="text-muted">Volte em breve para explorar nossa coleção.</p>
+            {% if user.is_authenticated and user.is_staff %}
+            <!-- CORREÇÃO: Use o namespace correto 'livros:adicionar_livro' -->
+            <a href="{% url 'livros:adicionar_livro' %}" class="btn btn-primary mt-3">Adicionar Primeiro Livro</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </section>
+
+<!-- Seção de exemplo removida para simplificação -->
+<style>
+    .card-img-custom {
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .book-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
 {% endblock %}

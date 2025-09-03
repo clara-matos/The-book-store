@@ -1,0 +1,124 @@
+<!-- templates/notas/nota_confirm_delete.html -->
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Exclusão de Nota - The Book Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'livros:lista_livros' %}"
+                            class="text-decoration-none">Livros</a></li>
+                    {% if nota.livro %}
+                    <li class="breadcrumb-item"><a href="{% url 'livros:detalhe_livro' nota.livro.pk %}"
+                            class="text-decoration-none">{{ nota.livro.titulo }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active">Excluir Nota</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">
+                        <i class="bi bi-exclamation-triangle me-2 text-warning"></i>
+                        Confirmar Exclusão
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-danger mb-3">Tem certeza que deseja excluir esta nota?</h5>
+
+                        <!-- Informações da nota -->
+                        <div class="card border-light">
+                            <div class="card-body">
+                                <h6 class="card-title">Sua nota:</h6>
+                                <p class="card-text">{{ nota.comentario }}</p>
+                                <div class="text-muted small">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Criada em: {{ nota.data|date:"d/m/Y" }}
+                                </div>
+                                {% if nota.livro %}
+                                <div class="text-muted small mt-2">
+                                    <i class="bi bi-book me-1"></i>
+                                    Livro: {{ nota.livro.titulo }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger rounded-pill flex-fill">
+                                <i class="bi bi-trash me-2"></i>
+                                Sim, Excluir Nota
+                            </button>
+                            {% if nota.livro %}
+                            <a href="{% url 'livros:detalhe_livro' nota.livro.pk %}"
+                                class="btn btn-outline-secondary rounded-pill">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Cancelar
+                            </a>
+                            {% else %}
+                            <a href="{% url 'notas:lista' %}" class="btn btn-outline-secondary rounded-pill">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Cancelar
+                            </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações adicionais -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>O que acontece quando excluo?</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0 small">
+                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Sua nota será permanentemente
+                            removida</li>
+                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Não será possível recuperar o
+                            conteúdo</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>O livro permanecerá disponível para
+                            novas notas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .btn {
+        transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .alert-warning {
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

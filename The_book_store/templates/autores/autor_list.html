@@ -5,39 +5,126 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fw-bold">Lista de Autores</h1>
+            <!-- Botão restrito apenas para usuários com permissão -->
+            {% if perms.autores.add_autor %}
             <a href="{% url 'autores:adicionar_autor' %}" class="btn btn-primary rounded-pill">Adicionar Novo Autor</a>
+            {% endif %}
         </div>
 
         {% if autores %}
-        <div class="table-responsive">
-            <table class="table table-striped table-hover rounded-3 overflow-hidden shadow-sm">
-                <thead class="bg-dark text-white">
-                    <tr>
-                        <th scope="col">Nome</th>
-                        <th scope="col">País</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for autor in autores %}
-                    <tr>
-                        <td><a href="{% url 'autores:autor_detalhe' pk=autor.pk %}">{{ autor.nome }}</a></td>
-                        <td>{{ autor.pais }}</td>
-                        <td>
-                            <a href="{% url 'autores:editar_autor' pk=autor.pk %}" class="btn btn-sm btn-outline-info rounded-pill">Editar</a>
-                            <a href="{% url 'autores:deletar_autor' pk=autor.pk %}" class="btn btn-sm btn-outline-danger rounded-pill">Deletar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for autor in autores %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3">
+                    <div class="card-body">
+                        <!-- Link para detalhes visível apenas para usuários autenticados -->
+                        {% if user.is_authenticated %}
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'autores:autor_detalhe' pk=autor.pk %}" class="text-decoration-none text-dark">{{ autor.nome }}</a>
+                        </h5>
+                        {% else %}
+                        <h5 class="card-title fw-bold text-dark">{{ autor.nome }}</h5>
+                        {% endif %}
+                        
+                        <p class="card-text">
+                            <span class="fw-semibold">País:</span> {{ autor.pais }}
+                        </p>
+                        
+                        <!-- Informações adicionais apenas para usuários com permissões especiais -->
+                        {% if perms.autores.view_autor_details %}
+                        <div class="mt-3 p-2 bg-light rounded">
+                            <small class="text-muted">
+                                <strong>Livros publicados:</strong> {{ autor.total_livros }}<br>
+                                <strong>Última atualização:</strong> {{ autor.ultima_atualizacao|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Área de botões de ação - só aparece se o usuário tiver alguma permissão -->
+                    {% if perms.autores.change_autor or perms.autores.delete_autor %}
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <div class="d-flex gap-2">
+                            <!-- Botão de editar restrito -->
+                            {% if perms.autores.change_autor %}
+                            <a href="{% url 'autores:editar_autor' pk=autor.pk %}" class="btn btn-sm btn-outline-info rounded-pill flex-fill">Editar</a>
+                            {% endif %}
+                            
+                            <!-- Botão de deletar com confirmação e restrição -->
+                            {% if perms.autores.delete_autor %}
+                            <a href="{% url 'autores:deletar_autor' pk=autor.pk %}" 
+                               class="btn btn-sm btn-outline-danger rounded-pill flex-fill confirm-delete"
+                               data-autor-nome="{{ autor.nome }}">
+                                Deletar
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
         {% else %}
         <div class="alert alert-info text-center" role="alert">
-            Nenhum autor cadastrado. Adicione um para começar!
+            Nenhum autor cadastrado. 
+            {% if perms.autores.add_autor %}
+            Adicione um para começar!
+            {% else %}
+            Entre em contato com um administrador para adicionar autores.
+            {% endif %}
         </div>
         {% endif %}
 
     </div>
 </section>
+
+<!-- Modal de confirmação para ações críticas -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmação de Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Tem certeza que deseja excluir o autor? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a id="confirmAction" href="#" class="btn btn-danger">Confirmar Exclusão</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+
+<script>
+    // Função para confirmar exclusão com modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.confirm-delete');
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmAction = document.getElementById('confirmAction');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const autorNome = this.getAttribute('data-autor-nome');
+                confirmMessage.textContent = `Tem certeza que deseja excluir o autor "${autorNome}"? Esta ação não pode ser desfeita.`;
+                confirmAction.href = this.href;
+                confirmModal.show();
+            });
+        });
+    });
+</script>
 {% endblock %}

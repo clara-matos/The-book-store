@@ -1,0 +1,168 @@
+{% extends '_base.html' %}
+
+{% block title %}Detalhes do Autor - {{ autor.nome }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Início</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'autores:autor_list' %}">Autores</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ autor.nome }}</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="fw-bold">{{ autor.nome }}</h1>
+                    <div>
+                        {% if perms.autores.change_autor %}
+                        <a href="{% url 'autores:editar_autor' pk=autor.pk %}" class="btn btn-outline-primary btn-sm rounded-pill">Editar</a>
+                        {% endif %}
+                        {% if perms.autores.delete_autor %}
+                        <a href="{% url 'autores:deletar_autor' pk=autor.pk %}" class="btn btn-outline-danger btn-sm rounded-pill ms-1 confirm-delete" data-autor-nome="{{ autor.nome }}">Excluir</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2 mb-3">Informações do Autor</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>País de origem:</strong> {{ autor.pais }}</p>
+                                <p><strong>Data de nascimento:</strong> {% if autor.data_nascimento %}{{ autor.data_nascimento|date:"d/m/Y" }}{% else %}Não informada{% endif %}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Data de falecimento:</strong> {% if autor.data_falecimento %}{{ autor.data_falecimento|date:"d/m/Y" }}{% else %}-{% endif %}</p>
+                                <p><strong>Gêneros literários:</strong> {% if autor.generos %}{{ autor.generos }}{% else %}Não informados{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2 mb-3">Biografia</h5>
+                        <p class="card-text">
+                            {% if autor.biografia %}
+                                {{ autor.biografia|linebreaksbr }}
+                            {% else %}
+                                <span class="text-muted">Nenhuma biografia disponível para este autor.</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2 mb-3">Livros do Autor</h5>
+                        {% with total_livros=autor.livros.all.count %}
+                        {% if autor.livros.all %}
+                        <div class="list-group list-group-flush">
+                            {% for livro in autor.livros.all %}
+                            <div class="list-group-item px-0">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ livro.titulo }}</h6>
+                                    <small>{% if livro.ano_publicacao %}{{ livro.ano_publicacao }}{% endif %}</small>
+                                </div>
+                                <small class="text-muted">{% if livro.genero %}{{ livro.genero }}{% endif %}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-0">Nenhum livro cadastrado para este autor.</p>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2 mb-3">Estatísticas</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total de livros:</span>
+                            <strong>{{ autor.livros.all.count }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Autor no sistema desde:</span>
+                            <strong>{% if autor.data_criacao %}{{ autor.data_criacao|date:"d/m/Y" }}{% else %}N/I{% endif %}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'autores:autor_list' %}" class="btn btn-secondary rounded-pill">
+                &larr; Voltar para a lista de autores
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de confirmação para exclusão -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmDeleteMessage">Tem certeza que deseja excluir este autor? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a id="confirmDeleteAction" href="#" class="btn btn-danger">Confirmar Exclusão</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+    }
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        padding: 0.75rem 0;
+    }
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    .card-title {
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuração do modal de confirmação de exclusão
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const confirmDeleteMessage = document.getElementById('confirmDeleteMessage');
+        const confirmDeleteAction = document.getElementById('confirmDeleteAction');
+        
+        document.querySelectorAll('.confirm-delete').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const autorNome = this.getAttribute('data-autor-nome');
+                confirmDeleteMessage.textContent = `Tem certeza que deseja excluir o autor "${autorNome}"? Esta ação não pode ser desfeita.`;
+                confirmDeleteAction.href = this.href;
+                confirmDeleteModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

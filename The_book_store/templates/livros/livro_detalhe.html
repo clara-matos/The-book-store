@@ -1,0 +1,223 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}{{ livro.titulo }} - The Book Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Coluna da capa do livro -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                {% if livro.capa %}
+                <img src="{{ livro.capa.url }}" class="card-img-top" alt="Capa de {{ livro.titulo }}" 
+                     style="height: 400px; object-fit: cover;">
+                {% else %}
+                <img src="https://placehold.co/400x600/4e73df/ffffff?text={{ livro.titulo|urlencode }}" 
+                     class="card-img-top" alt="Capa de {{ livro.titulo }}"
+                     style="height: 400px; object-fit: cover;">
+                {% endif %}
+            </div>
+            
+            <!-- Ações do livro -->
+            <div class="d-grid gap-2 mt-4">
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'livros:marcar_como_lido' livro.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn {% if livro.lido %}btn-success{% else %}btn-outline-success{% endif %} w-100 rounded-pill py-2">
+                        <i class="bi bi-{% if livro.lido %}check-circle-fill{% else %}circle{% endif %} me-2"></i>
+                        {% if livro.lido %}Marcado como Lido{% else %}Marcar como Lido{% endif %}
+                    </button>
+                </form>
+                
+                <a href="{% url 'notas:adicionar_para_livro' livro.pk %}" class="btn btn-outline-primary w-100 rounded-pill py-2">
+                    <i class="bi bi-pencil me-2"></i>Adicionar Nota
+                </a>
+                {% endif %}
+                
+                {% if user.is_staff %}
+                <div class="btn-group w-100 mt-2">
+                    <a href="{% url 'livros:editar_livro' livro.pk %}" class="btn btn-outline-secondary rounded-pill">
+                        <i class="bi bi-pencil-square me-2"></i>Editar
+                    </a>
+                    <a href="{% url 'livros:deletar_livro' livro.pk %}" class="btn btn-outline-danger rounded-pill">
+                        <i class="bi bi-trash me-2"></i>Excluir
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Informações adicionais -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informações</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>Gênero:</strong>
+                        {% if livro.genero %}
+                        <span class="badge bg-primary ms-2">{{ livro.genero.nome }}</span>
+                        {% else %}
+                        <span class="text-muted ms-2">Não especificado</span>
+                        {% endif %}
+                    </div>
+                    {% if livro.lido %}
+                    <div class="mb-2">
+                        <strong>Status:</strong>
+                        <span class="badge bg-success ms-2">Lido</span>
+                    </div>
+                    {% endif %}
+                    {% if livro.usuario %}
+                    <div class="mb-2">
+                        <strong>Na lista de:</strong>
+                        <span class="text-muted">{{ livro.usuario.user.username }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Coluna de informações do livro -->
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'livros:lista_livros' %}" class="text-decoration-none">Livros</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ livro.titulo }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="display-5 fw-bold mb-2">{{ livro.titulo }}</h1>
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-secondary me-2">Autor</span>
+                        <h2 class="h4 mb-0 text-primary">{{ livro.autor.nome }}</h2>
+                        {% if livro.autor.pais %}
+                        <small class="text-muted ms-2">({{ livro.autor.pais }})</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% if livro.autor.biografia %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light d-flex align-items-center">
+                    <i class="bi bi-person-badge me-2"></i>
+                    <h5 class="mb-0">Sobre o Autor</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ livro.autor.biografia }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Mais livros do mesmo autor -->
+            {% if outros_livros %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-book me-2"></i>Outros livros do autor</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                        {% for outro_livro in outros_livros %}
+                        <div class="col">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-book text-muted me-2"></i>
+                                <a href="{% url 'livros:detalhe_livro' outro_livro.pk %}" 
+                                   class="text-decoration-none text-truncate">
+                                    {{ outro_livro.titulo }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Notas de leitura -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-chat-text me-2"></i>
+                        Notas de Leitura
+                        <span class="badge bg-primary ms-2">{{ notas.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if notas %}
+                        {% for nota in notas %}
+                        <div class="border-start border-4 border-primary ps-3 mb-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <strong class="text-primary">{{ nota.usuario.user.username }}</strong>
+                                    <small class="text-muted ms-2">• {{ nota.data|date:"d/m/Y" }}</small>
+                                </div>
+                                {% if user.is_authenticated and user.perfil == nota.usuario %}
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'notas:editar' nota.pk %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'notas:deletar' nota.pk %}" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <p class="mb-0">{{ nota.comentario }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-chat-text display-4 text-muted mb-3"></i>
+                            <p class="text-muted">Nenhuma nota de leitura ainda.</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                    <div class="text-center mt-4">
+                        <a href="{% url 'notas:adicionar_para_livro' livro.pk %}" class="btn btn-primary rounded-pill">
+                            <i class="bi bi-plus-circle me-2"></i>Adicionar sua nota
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="text-center mt-4">
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill">
+                            <i class="bi bi-person me-2"></i>Faça login para adicionar uma nota
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5em 0.8em;
+}
+
+.border-start {
+    border-color: #4e73df !important;
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}
