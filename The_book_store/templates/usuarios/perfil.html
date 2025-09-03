@@ -2,180 +2,94 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <h1 class="h2 fw-bold text-primary">Meu Perfil</h1>
-                        <p class="text-muted">Gerencie suas informações pessoais</p>
-                    </div>
+    <div class="text-center mb-5">
+        <h1 class="h2 fw-bold text-primary">Meu Perfil</h1>
+        <p class="text-muted">Gerencie suas informações pessoais e sua lista de livros.</p>
+    </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title text-primary">
-                                        <i class="bi bi-person-circle me-2"></i>Informações Pessoais
-                                    </h5>
-                                    <div class="mt-3">
-                                        <p><strong>Usuário:</strong> {{ user.username }}</p>
-                                        <p><strong>Email:</strong> {{ user.email }}</p>
-                                        <p><strong>Membro desde:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 bg-light">
-                                <div class="card-body">
-                                    <h5 class="card-title text-primary">
-                                        <i class="bi bi-gear me-2"></i>Ações
-                                    </h5>
-                                    <div class="d-grid gap-2 mt-3">
-                                        <a href="{% url 'logout' %}" class="btn btn-danger">
-                                            <i class="bi bi-box-arrow-right me-2"></i>Sair da Conta
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Livros Avaliados -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <h5 class="card-title text-primary mb-0">
-                                            <i class="bi bi-star-fill me-2"></i>Livros que Avaliei
-                                        </h5>
-                                        <span class="badge bg-primary rounded-pill">
-                                            {{ user.nota_set.count }} avaliação{{ user.nota_set.count|pluralize }}
-                                        </span>
-                                    </div>
-
-                                    {% if user.nota_set.all %}
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Livro</th>
-                                                    <th>Autor</th>
-                                                    <th>Minha Nota</th>
-                                                    <th>Data da Avaliação</th>
-                                                    <th>Ações</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for nota in user.nota_set.all %}
-                                                <tr>
-                                                    <td>
-                                                        <strong>{{ nota.livro.titulo }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        {% if nota.livro.autor %}
-                                                            {{ nota.livro.autor.nome }}
-                                                        {% else %}
-                                                            <span class="text-muted">Não informado</span>
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-warning text-dark fs-6">
-                                                            {{ nota.valor }}/10
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted">
-                                                            {{ nota.data_criacao|date:"d/m/Y" }}
-                                                        </small>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{% url 'livros:detalhe_livro' nota.livro.pk %}" 
-                                                           class="btn btn-sm btn-outline-primary"
-                                                           title="Ver livro">
-                                                            <i class="bi bi-eye"></i>
-                                                        </a>
-                                                        <a href="{% url 'notas:editar_nota' nota.pk %}" 
-                                                           class="btn btn-sm btn-outline-secondary"
-                                                           title="Editar avaliação">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    {% else %}
-                                    <div class="text-center py-4">
-                                        <i class="bi bi-star text-muted" style="font-size: 3rem;"></i>
-                                        <p class="text-muted mt-3">Você ainda não avaliou nenhum livro.</p>
-                                        <a href="{% url 'livros:lista_livros' %}" class="btn btn-primary rounded-pill">
-                                            <i class="bi bi-book me-2"></i>Explorar Livros
-                                        </a>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Estatísticas Resumidas -->
-                    {% if user.nota_set.all %}
-                    <div class="row mt-4">
-                        <div class="col-md-4">
-                            <div class="card bg-primary text-white text-center">
-                                <div class="card-body">
-                                    <h6 class="card-title">Total de Avaliações</h6>
-                                    <h3 class="fw-bold">{{ user.nota_set.count }}</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-success text-white text-center">
-                                <div class="card-body">
-                                    <h6 class="card-title">Média das Notas</h6>
-                                    <h3 class="fw-bold">
-                                        {{ user.nota_set.avg_valor|default:0|floatformat:1 }}/10
-                                    </h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-info text-white text-center">
-                                <div class="card-body">
-                                    <h6 class="card-title">Última Avaliação</h6>
-                                    <h6 class="fw-bold">
-                                        {{ user.nota_set.latest.data_criacao|date:"d/m/Y"|default:"Nenhuma" }}
-                                    </h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
+    <div class="row g-4">
+        <!-- Foto e informações principais -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm rounded-4 text-center p-4">
+                {% if user.perfil.foto_perfil %}
+                <img src="{{ user.perfil.foto_perfil.url }}" class="rounded-circle mb-3" alt="Foto"
+                    style="width:120px; height:120px; object-fit:cover;">
+                {% else %}
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style="width:120px; height:120px;">
+                    <i class="bi bi-person-fill text-muted" style="font-size:4rem;"></i>
                 </div>
+                {% endif %}
+                <h5 class="fw-bold">{{ user.username }}</h5>
+                <p class="text-muted">{{ user.email }}</p>
+                <small class="text-secondary">Membro desde: {{ user.date_joined|date:"d/m/Y" }}</small>
+                <a href="{% url 'usuarios:editar_perfil' %}" class="btn btn-sm btn-primary mt-3 rounded-pill">
+                    <i class="bi bi-pencil-square me-1"></i> Editar
+                </a>
+            </div>
+        </div>
+
+        <!-- Informações pessoais -->
+        <div class="col-md-8">
+            <div class="card h-100 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Informações</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between"><strong>Usuário</strong> {{ user.username
+                        }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Email</strong> {{ user.email }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Biografia</strong> {{
+                        user.perfil.biografia|default:"Não informada" }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Nascimento</strong> {{
+                        user.perfil.data_nascimento|date:"d/m/Y"|default:"Não informada" }}</li>
+                </ul>
             </div>
         </div>
     </div>
+
+    <!-- Meus livros -->
+    <div class="row g-4 mt-1">
+        <div class="col-12">
+            <div class="card shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold text-primary mb-3"><i class="bi bi-book-half me-2"></i>Meus Livros</h5>
+                {% if livros_na_lista %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for livro in livros_na_lista %}
+                    <a href="{% url 'livros:detalhe_livro' livro.pk %}" class="badge bg-primary p-2 rounded-pill">{{
+                        livro.titulo }}</a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted">
+                    <i class="bi bi-book" style="font-size:2rem;"></i>
+                    <p class="mt-2">Nenhum livro adicionado.</p>
+                    <a href="{% url 'livros:lista_livros' %}" class="btn btn-sm btn-outline-primary">Explorar livros</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações de conta -->
+    <div class="d-grid gap-3 mt-4">
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-lg rounded-pill">
+            <i class="bi bi-box-arrow-right me-1"></i> Sair
+        </a>
+        <a href="{% url 'usuarios:deletar_perfil' %}" class="btn btn-danger btn-lg rounded-pill">
+            <i class="bi bi-trash me-1"></i> Excluir Perfil
+        </a>
+    </div>
+
 </div>
 
 <style>
-    .table th {
-        background-color: #f8f9fa;
-        border-top: none;
-        font-weight: 600;
-        color: #495057;
+    body {
+        background: #f8f9fa;
     }
-    
-    .table-hover tbody tr:hover {
-        background-color: rgba(13, 110, 253, 0.05);
-    }
-    
-    .card {
-        border: none;
-        border-radius: 0.8rem;
+
+    .badge:hover {
+        transform: translateY(-2px);
+        transition: 0.2s;
     }
 </style>
 {% endblock %}

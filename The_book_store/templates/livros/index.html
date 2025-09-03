@@ -7,34 +7,24 @@
         <h2 class="display-5 fw-bold mb-3">Encontre a Sua Próxima Grande Leitura</h2>
         <p class="lead text-muted mb-4">Milhares de livros, autores e histórias aguardam por si.</p>
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <!-- CORREÇÃO: Use o namespace correto 'livros:lista_livros' -->
-                <form method="GET" action="{% url 'livros:lista_livros' %}">
-                    <div class="input-group input-group-lg shadow-sm rounded-pill">
-                        <span class="input-group-text bg-white border-end-0 rounded-start-pill pe-0" id="search-addon">
-                            <i class="bi bi-search text-muted fs-5"></i>
-                        </span>
-                        <input type="search" name="q" class="form-control border-start-0 rounded-end-pill ps-2"
-                            placeholder="Pesquisar por título, autor ou editora" aria-label="Search"
-                            aria-describedby="search-addon">
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </section>
 
 <section class="py-5 px-4">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold">Livros em Destaque</h3>
-            <div class="d-flex gap-2">
-                <!-- CORREÇÃO: Use o namespace correto 'livros:lista_livros' -->
-                <a href="{% url 'livros:lista_livros' %}" class="btn btn-outline-primary rounded-pill">Ver Todos</a>
-                <!-- CORREÇÃO: Verifique se a URL 'autores' existe ou use o namespace correto -->
-                <a href="{% url 'autores:autor_list' %}" class="btn btn-outline-secondary rounded-pill">Ver Autores</a>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Livros em Destaque</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'livros:lista_livros' %}" class="btn btn-outline-primary rounded-pill">Ver Todos</a>
+            <a href="{% url 'autores:autor_list' %}" class="btn btn-outline-secondary rounded-pill">Ver Autores</a>
+            {% if user.is_authenticated and perms.livros.add_livro %}
+            <a href="{% url 'livros:adicionar_livro' %}" class="btn btn-success rounded-pill">
+                <i class="bi bi-plus-lg me-2"></i>Cadastrar Livro
+            </a>
+            {% endif %}
         </div>
+    </div>
+
 
         {% if livros %}
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -57,7 +47,6 @@
                             {% endif %}
                         </div>
                         <div class="mt-auto d-grid gap-2">
-                            <!-- CORREÇÃO: Use o namespace correto 'livros:detalhe_livro' -->
                             <a href="{% url 'livros:detalhe_livro' livro.pk %}"
                                 class="btn btn-primary btn-sm rounded-pill">Ver Detalhes</a>
                             {% if user.is_authenticated %}

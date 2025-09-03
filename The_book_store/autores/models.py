@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from genero.models import Genero  # Importando do app genero
+from generos.models import Genero  
 
 class Autor(models.Model):
     nome = models.CharField(max_length=200)

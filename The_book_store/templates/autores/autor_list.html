@@ -12,33 +12,6 @@
             {% endif %}
         </div>
 
-        <!-- Filtros -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="search" class="form-label">Buscar autor</label>
-                        <input type="text" class="form-control" id="search" name="search" 
-                               value="{{ request.GET.search }}" placeholder="Nome, país ou gênero...">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="genero" class="form-label">Filtrar por gênero</label>
-                        <select class="form-select" id="genero" name="genero">
-                            <option value="">Todos os gêneros</option>
-                            {% for genero in todos_generos %}
-                            <option value="{{ genero.id }}" {% if request.GET.genero == genero.id|stringformat:"s" %}selected{% endif %}>
-                                {{ genero.nome }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-outline-primary w-100">Filtrar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
         {% if autores %}
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for autor in autores %}

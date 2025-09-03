@@ -1,0 +1,26 @@
+{% extends '_base.html' %}
+
+{% block title %}Excluir Perfil{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body text-center p-4">
+                    <h2 class="text-danger fw-bold mb-3">Confirmar Exclusão</h2>
+                    <p class="lead">Tem certeza que deseja excluir seu perfil e conta?</p>
+                    <p class="text-muted">Esta ação é irreversível.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-pill">Excluir Perfil</button>
+                            <a href="{% url 'usuarios:perfil' %}" class="btn btn-outline-secondary btn-lg rounded-pill">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

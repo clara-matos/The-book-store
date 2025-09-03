@@ -1,28 +1,69 @@
 {% extends '_base.html' %}
 
-{% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2 fw-bold text-primary">Gêneros</h1>
-        <a href="{% url 'generos:adicionar_genero' %}" class="btn btn-primary rounded-pill shadow-sm">
-            <i class="bi bi-plus-lg me-2"></i>Adicionar Gênero
-        </a>
-    </div>
+{% block title %}Lista de Gêneros{% endblock %}
 
-    {% if generos %}  <!-- CORRIGIDO: object_list → generos -->
-    <div class="list-group">
-        {% for genero in generos %}  <!-- CORRIGIDO: object_list → generos -->
-        <a href="{% url 'generos:detalhe_genero' genero.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
-            <span>{{ genero.nome }}</span>
-            <small class="text-muted">{{ genero.descricao }}</small>
-        </a>
-        {% endfor %}
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">Lista de Gêneros</h1>
+            {% if perms.generos.add_genero %}
+            <a href="{% url 'generos:adicionar_genero' %}" class="btn btn-primary rounded-pill">
+                <i class="bi bi-plus-lg me-2"></i>Adicionar Gênero
+            </a>
+            {% endif %}
+        </div>
+
+        {% if generos %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for genero in generos %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 d-flex flex-column justify-content-between">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'generos:detalhe_genero' genero.pk %}" class="text-decoration-none text-dark">
+                                {{ genero.nome }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">{{ genero.descricao|default:"Sem descrição disponível." }}</p>
+                    </div>
+
+                    {% if perms.generos.change_genero or perms.generos.delete_genero %}
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <div class="d-flex gap-2">
+                            {% if perms.generos.change_genero %}
+                            <a href="{% url 'generos:editar_genero' genero.pk %}" class="btn btn-sm btn-outline-info rounded-pill flex-fill">Editar</a>
+                            {% endif %}
+                            {% if perms.generos.delete_genero %}
+                            <a href="{% url 'generos:deletar_genero' genero.pk %}" class="btn btn-sm btn-outline-danger rounded-pill flex-fill">Excluir</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Nenhum gênero encontrado. 
+            {% if perms.generos.add_genero %}
+            <a href="{% url 'generos:adicionar_genero' %}" class="alert-link">Adicione um gênero</a> para começar!
+            {% else %}
+            Entre em contato com um administrador para adicionar gêneros.
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="text-center p-5 border rounded-3 bg-light">
-        <p class="lead text-muted">Ainda não há gêneros cadastrados.</p>
-        <a href="{% url 'generos:adicionar_genero' %}" class="btn btn-primary mt-3 rounded-pill shadow-sm">Adicionar Gênero</a>
-    </div>
-    {% endif %}
-</div>
+</section>
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
 {% endblock %}

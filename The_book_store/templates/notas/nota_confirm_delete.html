@@ -1,4 +1,3 @@
-<!-- templates/notas/nota_confirm_delete.html -->
 {% extends '_base.html' %}
 {% load static %}
 
@@ -10,11 +9,9 @@
         <div class="col-md-8 col-lg-6">
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'livros:lista_livros' %}"
-                            class="text-decoration-none">Livros</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'livros:lista_livros' %}" class="text-decoration-none">Livros</a></li>
                     {% if nota.livro %}
-                    <li class="breadcrumb-item"><a href="{% url 'livros:detalhe_livro' nota.livro.pk %}"
-                            class="text-decoration-none">{{ nota.livro.titulo }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'livros:detalhe_livro' nota.livro.pk %}" class="text-decoration-none">{{ nota.livro.titulo }}</a></li>
                     {% endif %}
                     <li class="breadcrumb-item active">Excluir Nota</li>
                 </ol>
@@ -39,7 +36,17 @@
                         <!-- Informações da nota -->
                         <div class="card border-light">
                             <div class="card-body">
-                                <h6 class="card-title">Sua nota:</h6>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">Sua nota:</h6>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-2">
+                                            <i class="bi bi-hand-thumbs-up-fill"></i> {{ nota.likes }}
+                                        </span>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-hand-thumbs-down-fill"></i> {{ nota.dislikes }}
+                                        </span>
+                                    </div>
+                                </div>
                                 <p class="card-text">{{ nota.comentario }}</p>
                                 <div class="text-muted small">
                                     <i class="bi bi-calendar me-1"></i>
@@ -49,6 +56,12 @@
                                 <div class="text-muted small mt-2">
                                     <i class="bi bi-book me-1"></i>
                                     Livro: {{ nota.livro.titulo }}
+                                </div>
+                                {% endif %}
+                                {% if nota.total_avaliacoes > 0 %}
+                                <div class="text-muted small mt-2">
+                                    <i class="bi bi-star me-1"></i>
+                                    Avaliada {{ nota.total_avaliacoes }} vez(es)
                                 </div>
                                 {% endif %}
                             </div>
@@ -63,8 +76,7 @@
                                 Sim, Excluir Nota
                             </button>
                             {% if nota.livro %}
-                            <a href="{% url 'livros:detalhe_livro' nota.livro.pk %}"
-                                class="btn btn-outline-secondary rounded-pill">
+                            <a href="{% url 'livros:detalhe_livro' nota.livro.pk %}" class="btn btn-outline-secondary rounded-pill">
                                 <i class="bi bi-x-circle me-2"></i>
                                 Cancelar
                             </a>
@@ -86,12 +98,10 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mb-0 small">
-                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Sua nota será permanentemente
-                            removida</li>
-                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Não será possível recuperar o
-                            conteúdo</li>
-                        <li><i class="bi bi-check-circle text-success me-2"></i>O livro permanecerá disponível para
-                            novas notas</li>
+                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Sua nota será permanentemente removida</li>
+                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Todas as avaliações ({{ nota.total_avaliacoes }}) serão perdidas</li>
+                        <li class="mb-2"><i class="bi bi-dash-circle text-danger me-2"></i>Não será possível recuperar o conteúdo</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>O livro permanecerá disponível para novas notas</li>
                     </ul>
                 </div>
             </div>
@@ -119,6 +129,10 @@
 
     .alert-warning {
         border-radius: 8px;
+    }
+    
+    .badge {
+        font-size: 0.8rem;
     }
 </style>
 {% endblock %}

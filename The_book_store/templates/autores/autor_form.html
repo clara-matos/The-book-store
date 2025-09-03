@@ -1,5 +1,9 @@
 {% extends '_base.html' %}
 
+{% block title %}
+    {% if form.instance.pk %}Editar Autor{% else %}Adicionar Novo Autor{% endif %}
+{% endblock %}
+
 {% block content %}
 <section class="py-5">
     <div class="container">
@@ -10,14 +14,45 @@
                         <h1 class="card-title text-center fw-bold mb-4">
                             {% if form.instance.pk %}Editar Autor{% else %}Adicionar Novo Autor{% endif %}
                         </h1>
+
                         <form method="post">
                             {% csrf_token %}
-                            {{ form.as_p }}
+
+                            {% for field in form %}
+                                {% if field.name != 'generos' %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="text-danger small">{{ field.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="mb-3">
+                                <label class="form-label">Gêneros literários associados</label>
+                                <div class="row">
+                                    {% for checkbox in form.generos %}
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            {{ checkbox.tag }}
+                                            <label class="form-check-label">{{ checkbox.choice_label }}</label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.generos.errors %}
+                                    <div class="text-danger small mt-2">{{ form.generos.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg rounded-pill">Salvar</button>
                                 <a href="{% url 'autores:autor_list' %}" class="btn btn-link mt-2">Cancelar</a>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>

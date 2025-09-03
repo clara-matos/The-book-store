@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block title %}Editar Livro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Editar "{{ form.instance.titulo }}"</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{% url 'livros:detalhe_livro' pk=form.instance.pk %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
