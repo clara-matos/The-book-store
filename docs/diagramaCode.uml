@@ -1,0 +1,68 @@
+@startuml
+left to right direction
+skinparam classAttributeIconSize 0
+
+' ========================
+' Pacote do Django (auth)
+' ========================
+package "django.contrib.auth" {
+  class User {
+    + id : Integer
+    + username : String
+    + email : String
+    + password : String
+  }
+}
+
+' ========================
+' Modelos do Projeto
+' ========================
+class Usuario {
+  + biografia : TextField
+  + data_nascimento : DateField
+}
+
+class Autor {
+  + id : Integer
+  + nome : CharField
+  + pais : CharField
+  + data_nascimento : DateField
+  + biografia : TextField
+}
+
+class Genero {
+  + id : Integer
+  + nome : CharField
+  + descricao : TextField
+}
+
+class Livro {
+  + id : Integer
+  + titulo : CharField
+  + lido : BooleanField
+  + capa : ImageField
+}
+
+class NotaDeLeitura {
+  + id : Integer
+  + comentario : TextField
+  + data : DateField
+}
+
+' ========================
+' Relacionamentos
+' ========================
+' Herança e Relações 1:1
+Usuario "1" -- "1" User : user (OneToOneField)
+
+' Relacionamentos 1:N (ForeignKey)
+Livro "0..n" -- "1" Autor
+Livro "0..n" -- "0..1" Genero
+Livro "0..n" -- "0..1" Usuario
+NotaDeLeitura "0..n" -- "1" Livro
+NotaDeLeitura "0..n" -- "1" Usuario
+
+' Relacionamentos N:N (ManyToManyField)
+Autor "0..n" -- "0..n" Genero
+
+@enduml

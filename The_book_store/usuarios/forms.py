@@ -1,13 +1,13 @@
 from django import forms
-from .models import PerfilUsuario
+from .models import Usuario
 
-class PerfilUsuarioForm(forms.ModelForm):
+class UsuarioForm(forms.ModelForm):
     """
     Formulário para a criação e edição do perfil do usuário.
     """
     class Meta:
-        model = PerfilUsuario
-        fields = ['biografia', 'data_nascimento']
+        model = Usuario
+        fields = ('biografia', 'data_nascimento')
         widgets = {
             'biografia': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Conte um pouco sobre você...'}),
             'data_nascimento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),

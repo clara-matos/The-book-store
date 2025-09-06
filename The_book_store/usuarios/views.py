@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from .forms import PerfilUsuarioForm
+from .forms import UsuarioForm
 from django.contrib import messages
 from livros.models import Livro
 from notas.models import NotaDeLeitura
-from usuarios.models import PerfilUsuario
+from .models import Usuario
 from django.urls import reverse
-
+from django.contrib.auth.forms import UserCreationForm
 
 @login_required
 def perfil(request):
@@ -16,14 +16,10 @@ def perfil(request):
     Exibe a página de perfil do usuário.
     Requer que o usuário esteja logado.
     """
-    try:
-        perfil_usuario = request.user.perfil
-        livros_na_lista = perfil_usuario.minha_biblioteca.all()
-        user_notas = NotaDeLeitura.objects.filter(usuario=perfil_usuario)
-
-    except PerfilUsuario.DoesNotExist:
-        messages.error(request, "Seu perfil não foi encontrado. Por favor, crie um perfil para continuar.")
-        return redirect('livros:lista_livros')
+    # Como Usuario agora herda de User, podemos usar request.user diretamente.
+    usuario_logado = request.user
+    livros_na_lista = Livro.objects.filter(usuario=usuario_logado)
+    user_notas = NotaDeLeitura.objects.filter(usuario=usuario_logado)
 
     context = {
         'livros_na_lista': livros_na_lista,
@@ -31,7 +27,6 @@ def perfil(request):
     }
 
     return render(request, 'usuarios/perfil.html', context)
-
 
 def registro(request):
     """
@@ -41,10 +36,8 @@ def registro(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            # A classe UserCreationForm cria uma instância do AUTH_USER_MODEL, que é Usuario.
             user = form.save()
-
-            # Cria o perfil vinculado ao usuário
-            PerfilUsuario.objects.create(user=user)
 
             # Faz login automático
             login(request, user)
@@ -57,26 +50,22 @@ def registro(request):
     return render(request, 'usuarios/registro.html', {'form': form})
 
 
-
 @login_required
 def editar_perfil(request):
     """
     Permite que o usuário edite seu perfil.
     """
-    try:
-        perfil_usuario = request.user.perfil
-    except PerfilUsuario.DoesNotExist:
-        messages.error(request, "Seu perfil não foi encontrado. Por favor, crie um perfil para continuar.")
-        return redirect('livros:lista')
+    # Usamos request.user diretamente.
+    usuario = request.user
 
     if request.method == 'POST':
-        form = PerfilUsuarioForm(request.POST, request.FILES, instance=perfil_usuario)
+        form = UsuarioForm(request.POST, request.FILES, instance=usuario)
         if form.is_valid():
             form.save()
             messages.success(request, 'Seu perfil foi atualizado com sucesso!')
             return redirect('usuarios:perfil')
     else:
-        form = PerfilUsuarioForm(instance=perfil_usuario)
+        form = UsuarioForm(instance=usuario)
 
     context = {'form': form}
     return render(request, 'usuarios/editar_perfil.html', context)
@@ -87,19 +76,14 @@ def deletar_perfil(request):
     """
     Permite que o usuário exclua seu próprio perfil.
     """
-    try:
-        perfil_usuario = request.user.perfil
-    except PerfilUsuario.DoesNotExist:
-        messages.error(request, "Perfil não encontrado.")
-        return redirect('usuarios:perfil')
+    # Usamos request.user diretamente.
+    usuario = request.user
 
     if request.method == 'POST':
-        # Opcional: deletar o usuário também
-        user = request.user
-        perfil_usuario.delete()
-        user.delete()
+        # Ao deletar o usuário, o perfil é automaticamente deletado por causa do on_delete=models.CASCADE.
+        usuario.delete()
         messages.success(request, "Seu perfil e conta foram excluídos com sucesso.")
         return redirect('livros:lista_livros')  # ou 'login' ou outra página pública
 
-    context = {'perfil': perfil_usuario}
+    context = {'usuario': usuario}
     return render(request, 'usuarios/deletar_perfil.html', context)

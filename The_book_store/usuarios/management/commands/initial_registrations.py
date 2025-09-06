@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError, transaction, connection
 from datetime import date, timedelta
@@ -7,10 +7,11 @@ import sys
 import random
 
 # Importa todos os modelos do projeto The Book Store
-from django.contrib.auth.models import User
-from livros.models import Livro, Autor, Genero
-from usuarios.models import PerfilUsuario
+from usuarios.models import Usuario
+from livros.models import Livro
 from notas.models import NotaDeLeitura
+from autores.models import Autor
+from generos.models import Genero
 
 class Command(BaseCommand):
     help = 'Executa o setup inicial do projeto The Book Store, criando grupos, usuários de teste e dados de exemplo.'
@@ -105,8 +106,8 @@ class Command(BaseCommand):
                 ('add_notadeleitura', NotaDeLeitura),
                 ('change_notadeleitura', NotaDeLeitura),
                 ('delete_notadeleitura', NotaDeLeitura),
-                ('view_perfilusuario', PerfilUsuario),
-                ('change_perfilusuario', PerfilUsuario),
+                ('view_usuario', Usuario),
+                ('change_usuario', Usuario),
             ],
         }
 
@@ -144,16 +145,19 @@ class Command(BaseCommand):
         
         username = 'admin'
         email = 'admin@thebookstore.com'
-        password = 'admin123'  # Senha mais segura
+        password = 'admin123'
 
-        if not User.objects.filter(username=username).exists():
-            admin_user = User.objects.create_superuser(username, email, password)
-            # Criar perfil para o admin
-            PerfilUsuario.objects.create(user=admin_user, biografia="Administrador do sistema The Book Store")
+        if not Usuario.objects.filter(username=username).exists():
+            admin_user = Usuario.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password,
+                biografia="Administrador do sistema The Book Store"
+            )
             self.stdout.write(self.style.SUCCESS(f"Admin '{username}' criado com sucesso."))
         else:
             self.stdout.write(self.style.WARNING(f"Admin '{username}' já existe."))
-
+    
     def _setup_autores(self):
         """Configura autores iniciais"""
         self.stdout.write(self.style.SUCCESS("\n--- Criando Autores ---"))
@@ -260,20 +264,20 @@ class Command(BaseCommand):
     def _create_dev_user(self, user_data):
         """Cria um usuário de desenvolvimento"""
         username = user_data['username']
+        perfil_data = user_data.get('perfil_data', {})
         
-        user, created = User.objects.get_or_create(
+        user, created = Usuario.objects.get_or_create(
             username=username,
             defaults={
                 'email': user_data['email'],
                 'is_staff': user_data.get('is_staff', False),
+                **perfil_data
             }
         )
         
         if created:
             user.set_password(user_data['password'])
             user.save()
-            # Criar perfil do usuário
-            PerfilUsuario.objects.create(user=user, **user_data['perfil_data'])
             self.stdout.write(self.style.SUCCESS(f"Utilizador '{username}' criado com sucesso."))
         else:
             self.stdout.write(self.style.WARNING(f"Utilizador '{username}' já existe."))
@@ -284,9 +288,9 @@ class Command(BaseCommand):
         try:
             group = Group.objects.get(name=user_data['group'])
             user.groups.add(group)
-            self.stdout.write(self.style.SUCCESS(f"  - Adicionado ao grupo: {user_data['group']}"))
+            self.stdout.write(self.style.SUCCESS(f"   - Adicionado ao grupo: {user_data['group']}"))
         except Group.DoesNotExist:
-            self.stdout.write(self.style.ERROR(f"  - Grupo '{user_data['group']}' não encontrado."))
+            self.stdout.write(self.style.ERROR(f"   - Grupo '{user_data['group']}' não encontrado."))
         
         return user
     
@@ -359,13 +363,15 @@ class Command(BaseCommand):
         
         self.livros = {}
         for livro_data in livros_data:
+            # Acessa diretamente a instância do usuário, sem o .perfil
+            usuario = self.users['leitor1'] if livro_data['lido'] else None
             livro, created = Livro.objects.get_or_create(
                 titulo=livro_data['titulo'],
                 autor=livro_data['autor'],
                 defaults={
                     'genero': livro_data['genero'],
                     'lido': livro_data['lido'],
-                    'usuario': self.users['leitor1'].perfil if livro_data['lido'] else None
+                    'usuario': usuario
                 }
             )
             self.livros[livro.titulo] = livro
@@ -382,22 +388,22 @@ class Command(BaseCommand):
         notas_data = [
             {
                 'livro': self.livros['1984'],
-                'usuario': self.users['leitor1'].perfil,
+                'usuario': self.users['leitor1'],
                 'comentario': 'Uma distopia assustadoramente relevante até hoje. Leitura obrigatória!',
             },
             {
                 'livro': self.livros['O Senhor dos Anéis: A Sociedade do Anel'],
-                'usuario': self.users['leitor1'].perfil,
+                'usuario': self.users['leitor1'],
                 'comentario': 'Fantasia épica no seu melhor. Tolkien é um mestre da worldbuilding.',
             },
             {
                 'livro': self.livros['Dom Casmurro'],
-                'usuario': self.users['leitor1'].perfil,
+                'usuario': self.users['leitor1'],
                 'comentario': 'Machado de Assis em sua genialidade. A ambiguidade de Bentinho é fascinante.',
             },
             {
                 'livro': self.livros['Fundação'],
-                'usuario': self.users['leitor1'].perfil,
+                'usuario': self.users['leitor1'],
                 'comentario': 'Uma das melhores séries de ficção científica já escritas. Asimov era visionário.',
             },
         ]
@@ -411,11 +417,11 @@ class Command(BaseCommand):
             
             if created:
                 self.stdout.write(self.style.SUCCESS(
-                    f"Nota criada: {nota.usuario.user.username} para '{nota.livro.titulo}'"
+                    f"Nota criada: {nota.usuario.username} para '{nota.livro.titulo}'"
                 ))
             else:
                 self.stdout.write(self.style.WARNING(
-                    f"Nota já existe: {nota.usuario.user.username} para '{nota.livro.titulo}'"
+                    f"Nota já existe: {nota.usuario.username} para '{nota.livro.titulo}'"
                 ))
     
     def _show_login_credentials(self):

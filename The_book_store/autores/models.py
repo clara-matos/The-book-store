@@ -25,7 +25,6 @@ class Autor(models.Model):
     
     @property
     def generos_principais(self):
-        """Retorna os gêneros mais comuns nos livros do autor"""
         from django.db.models import Count
         return Genero.objects.filter(livro__autores=self).annotate(
             total_livros=Count('livro')
