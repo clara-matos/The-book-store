@@ -287,7 +287,9 @@ class Command(BaseCommand):
         
         try:
             group = Group.objects.get(name=user_data['group'])
-            user.groups.add(group)
+            # Altera a atribuição do grupo para usar a ForeignKey 'group'
+            user.group = group
+            user.save()
             self.stdout.write(self.style.SUCCESS(f"   - Adicionado ao grupo: {user_data['group']}"))
         except Group.DoesNotExist:
             self.stdout.write(self.style.ERROR(f"   - Grupo '{user_data['group']}' não encontrado."))

@@ -13,8 +13,8 @@
         <!-- Foto e informações principais -->
         <div class="col-md-4">
             <div class="card h-100 shadow-sm rounded-4 text-center p-4">
-                {% if user.perfil.foto_perfil %}
-                <img src="{{ user.perfil.foto_perfil.url }}" class="rounded-circle mb-3" alt="Foto"
+                {% if user.foto_perfil %}
+                <img src="{{ user.foto_perfil.url }}" class="rounded-circle mb-3" alt="Foto"
                     style="width:120px; height:120px; object-fit:cover;">
                 {% else %}
                 <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
@@ -38,8 +38,8 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between"><strong>Usuário</strong> {{ user.username }}</li>
                     <li class="list-group-item d-flex justify-content-between"><strong>Email</strong> {{ user.email }}</li>
-                    <li class="list-group-item d-flex justify-content-between"><strong>Biografia</strong> {{ user.perfil.biografia|default:"Não informada" }}</li>
-                    <li class="list-group-item d-flex justify-content-between"><strong>Nascimento</strong> {{ user.perfil.data_nascimento|date:"d/m/Y"|default:"Não informada" }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Biografia</strong> {{ user.usuario.biografia|default:"Não informada" }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>Nascimento</strong> {{ user.usuario.data_nascimento|date:"d/m/Y"|default:"Não informada" }}</li>
                 </ul>
             </div>
         </div>
@@ -69,14 +69,9 @@
 
     <!-- Ações de conta -->
     <div class="d-grid gap-3 mt-4">
-        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-lg rounded-pill">
-            <i class="bi bi-box-arrow-right me-1"></i> Sair
-        </a>
-        {% if perms.usuarios.delete_perfilusuario %}
         <button type="button" class="btn btn-danger btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
             <i class="bi bi-trash me-1"></i> Excluir Perfil
         </button>
-        {% endif %}
     </div>
 </div>
 

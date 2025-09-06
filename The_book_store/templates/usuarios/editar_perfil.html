@@ -1,5 +1,7 @@
 {% extends '_base.html' %}
 
+{% block title %}Editar Perfil{% endblock %}
+
 {% block content %}
 <section class="py-5">
     <div class="container">
@@ -22,12 +24,12 @@
                                 </div>
                             {% endif %}
 
-                            {% if user.perfil.foto_perfil %}
+                            {% if user.foto_perfil %}
                                 <div class="text-center mb-4">
-                                    <img src="{{ user.perfil.foto_perfil.url }}" 
-                                         class="rounded-circle shadow-sm" 
-                                         alt="Foto de perfil atual" 
-                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                    <img src="{{ user.foto_perfil.url }}" 
+                                            class="rounded-circle shadow-sm" 
+                                            alt="Foto de perfil atual" 
+                                            style="width: 100px; height: 100px; object-fit: cover;">
                                     <p class="text-muted small mt-2">Foto atual</p>
                                 </div>
                             {% endif %}

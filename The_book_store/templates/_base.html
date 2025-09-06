@@ -89,15 +89,18 @@
                     </button>
                     {% if user.is_authenticated %}
                         <a href="{% url 'usuarios:perfil' %}">
-                            {% if user.perfilusuario.foto_perfil %}
-                                <div class="rounded-circle" style='background-image: url("{{ user.perfilusuario.foto_perfil.url }}"); height: 2.5rem; width: 2.5rem; background-size: cover; background-position: center;'></div>
+                            {% if user.foto_perfil %}
+                                <div class="rounded-circle" style='background-image: url("{{ user.foto_perfil.url }}"); height: 2.5rem; width: 2.5rem; background-size: cover; background-position: center;'></div>
                             {% else %}
                                 <div class="rounded-circle d-flex align-items-center justify-content-center" style='background-color: #e0e0e0; height: 2.5rem; width: 2.5rem;'>
                                     <i class="bi bi-person fs-5" style="color: #606060;"></i>
                                 </div>
                             {% endif %}
                         </a>
-                        <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-secondary">Sair</a>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Sair</button>
+                        </form>
                     {% else %}
                         <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">Login</a>
                         <a href="{% url 'usuarios:registro' %}" class="btn btn-sm btn-primary">Cadastro</a>
@@ -107,7 +110,7 @@
         </div>
     </header>
 
-    <main class="flex-grow-1">
+    <main>
         {% block content %}
             <!-- Conteúdo específico das páginas filhas virá aqui -->
         {% endblock %}
