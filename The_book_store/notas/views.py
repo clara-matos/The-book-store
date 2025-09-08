@@ -7,7 +7,6 @@ from livros.models import Livro
 
 
 @login_required
-@permission_required('notas.view_notadeleitura', raise_exception=True)
 def nota_list(request):
     """
     Exibe uma lista das notas de leitura do usuário logado.
@@ -18,7 +17,6 @@ def nota_list(request):
 
 
 @login_required
-@permission_required('notas.view_notadeleitura', raise_exception=True)
 def nota_detalhe(request, pk):
     """
     Exibe os detalhes de uma única nota.
@@ -30,7 +28,6 @@ def nota_detalhe(request, pk):
 
 
 @login_required
-@permission_required('notas.add_notadeleitura', raise_exception=True)
 def adicionar_nota(request, livro_id):
     """
     Permite a criação de uma nova nota para um livro específico.

@@ -11,7 +11,6 @@ from django.urls import reverse
 
 
 @login_required
-@permission_required('usuario.view_usuario', raise_exception=True)
 def perfil(request):
     """
     Exibe a página de perfil do usuário.
@@ -31,7 +30,6 @@ def perfil(request):
 
 
 @login_required
-@permission_required('usuario.view_usuario', raise_exception=True)
 def lista_usuarios(request):
     """
     Exibe uma lista de todos os usuários.
@@ -42,7 +40,6 @@ def lista_usuarios(request):
     return render(request, 'usuarios/lista.html', context)
 
 
-@permission_required('usuario.add_usuario', raise_exception=True)
 def registro(request):
     """
     Permite que novos usuários se registrem.
@@ -66,7 +63,6 @@ def registro(request):
 
 
 @login_required
-@permission_required('usuario.change_usuario', raise_exception=True)
 def editar_perfil(request):
     """
     Permite que o usuário edite seu perfil.

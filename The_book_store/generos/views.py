@@ -5,7 +5,6 @@ from .forms import GeneroForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
-@permission_required('generos.view_genero', raise_exception=True)
 def genero_list(request):
     """
     Exibe uma lista de todos os gêneros.
@@ -15,7 +14,6 @@ def genero_list(request):
     return render(request, 'generos/genero_list.html', context)
 
 @login_required
-@permission_required('generos.view_genero', raise_exception=True)
 def genero_detalhe(request, pk):
     """
     Exibe os detalhes de um único gênero.

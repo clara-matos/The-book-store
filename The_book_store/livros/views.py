@@ -15,7 +15,6 @@ def listar_livros(request):
     return render(request, 'livros/index.html', context)
 
 
-@permission_required('livros.view_livro', raise_exception=True)
 def livro_detalhe(request, pk):
     """
     Exibe os detalhes de um único livro.
@@ -45,7 +44,6 @@ def livro_detalhe(request, pk):
 
 
 @login_required
-@permission_required('livros.add_livro', raise_exception=True)
 def adicionar_livro(request):
     """
     Permite a criação de um novo livro.
@@ -65,7 +63,6 @@ def adicionar_livro(request):
 
 
 @login_required
-@permission_required('livros.change_livro', raise_exception=True)
 def editar_livro(request, pk):
     """
     Permite a atualização de um livro existente.
@@ -85,7 +82,6 @@ def editar_livro(request, pk):
 
 
 @login_required
-@permission_required('livros.delete_livro', raise_exception=True)
 def deletar_livro(request, pk):
     """
     Permite a exclusão de um livro.
@@ -101,7 +97,6 @@ def deletar_livro(request, pk):
 
 
 @login_required
-@permission_required('livros.add_livro', raise_exception=True)
 def adicionar_a_lista(request, pk):
     livro = get_object_or_404(Livro, pk=pk)
     
@@ -121,7 +116,6 @@ def adicionar_a_lista(request, pk):
 
 
 @login_required
-@permission_required('livros.change_livro', raise_exception=True)
 def marcar_como_lido(request, pk):
     livro = get_object_or_404(Livro, pk=pk)
 
