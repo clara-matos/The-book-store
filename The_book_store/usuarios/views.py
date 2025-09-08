@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from .forms import UsuarioForm
@@ -8,9 +8,10 @@ from livros.models import Livro
 from notas.models import NotaDeLeitura
 from .models import Usuario
 from django.urls import reverse
-from django.contrib.auth.forms import UserCreationForm
+
 
 @login_required
+@permission_required('usuario.view_usuario', raise_exception=True)
 def perfil(request):
     """
     Exibe a página de perfil do usuário.
@@ -28,6 +29,20 @@ def perfil(request):
 
     return render(request, 'usuarios/perfil.html', context)
 
+
+@login_required
+@permission_required('usuario.view_usuario', raise_exception=True)
+def lista_usuarios(request):
+    """
+    Exibe uma lista de todos os usuários.
+    Requer que o usuário esteja logado e tenha permissão de visualização.
+    """
+    usuarios = Usuario.objects.all().order_by('username')
+    context = {'usuarios': usuarios}
+    return render(request, 'usuarios/lista.html', context)
+
+
+@permission_required('usuario.add_usuario', raise_exception=True)
 def registro(request):
     """
     Permite que novos usuários se registrem.
@@ -51,6 +66,7 @@ def registro(request):
 
 
 @login_required
+@permission_required('usuario.change_usuario', raise_exception=True)
 def editar_perfil(request):
     """
     Permite que o usuário edite seu perfil.
@@ -72,6 +88,7 @@ def editar_perfil(request):
 
 
 @login_required
+@permission_required('usuario.delete_usuario', raise_exception=True)
 def deletar_perfil(request):
     """
     Permite que o usuário exclua seu próprio perfil.
@@ -83,7 +100,6 @@ def deletar_perfil(request):
         # Ao deletar o usuário, o perfil é automaticamente deletado por causa do on_delete=models.CASCADE.
         usuario.delete()
         messages.success(request, "Seu perfil e conta foram excluídos com sucesso.")
-        return redirect('livros:lista_livros')  # ou 'login' ou outra página pública
-
+        return redirect('livros:lista_livros')
     context = {'usuario': usuario}
     return render(request, 'usuarios/deletar_perfil.html', context)

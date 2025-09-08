@@ -4,7 +4,8 @@ from .models import Autor
 from .forms import AutorForm 
 from django.contrib.auth.decorators import login_required, permission_required
 
-
+@login_required
+@permission_required('autores.view_autor', raise_exception=True)
 def autor_list(request):
     """
     Exibe uma lista de todos os autores.
@@ -13,6 +14,8 @@ def autor_list(request):
     context = {'autores': autores}
     return render(request, 'autores/autor_list.html', context)
 
+@login_required
+@permission_required('autores.view_autor', raise_exception=True)
 def autor_detalhe(request, pk):
     """
     Exibe os detalhes de um único autor.

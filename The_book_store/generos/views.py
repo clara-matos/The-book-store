@@ -4,6 +4,8 @@ from .models import Genero
 from .forms import GeneroForm
 from django.contrib.auth.decorators import login_required, permission_required
 
+@login_required
+@permission_required('generos.view_genero', raise_exception=True)
 def genero_list(request):
     """
     Exibe uma lista de todos os gêneros.
@@ -12,6 +14,8 @@ def genero_list(request):
     context = {'generos': generos}
     return render(request, 'generos/genero_list.html', context)
 
+@login_required
+@permission_required('generos.view_genero', raise_exception=True)
 def genero_detalhe(request, pk):
     """
     Exibe os detalhes de um único gênero.
@@ -30,7 +34,7 @@ def adicionar_genero(request):
         form = GeneroForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(reverse('generos:lista_generos'))  # CORRIGIDO
+            return redirect(reverse('generos:lista_generos'))
     else:
         form = GeneroForm()
     
@@ -48,13 +52,15 @@ def editar_genero(request, pk):
         form = GeneroForm(request.POST, instance=genero)
         if form.is_valid():
             form.save()
-            return redirect(reverse('generos:lista_generos'))  # CORRIGIDO
+            return redirect(reverse('generos:lista_generos'))
     else:
         form = GeneroForm(instance=genero)
         
     context = {'form': form}
     return render(request, 'generos/genero_form.html', context)
 
+@login_required
+@permission_required('generos.delete_genero', raise_exception=True)
 def deletar_genero(request, pk):
     """
     Permite a exclusão de um gênero.
@@ -62,7 +68,7 @@ def deletar_genero(request, pk):
     genero = get_object_or_404(Genero, pk=pk)
     if request.method == 'POST':
         genero.delete()
-        return redirect(reverse('generos:lista_generos'))  # CORRIGIDO
+        return redirect(reverse('generos:lista_generos'))
         
     context = {'genero': genero}
     return render(request, 'generos/genero_confirm_delete.html', context)

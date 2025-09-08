@@ -3,19 +3,19 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.urls import reverse
 from .models import Livro, Autor, Genero
 from .forms import LivroForm
-from django.contrib import messages
 from notas.models import NotaDeLeitura
 
 
 def listar_livros(request):
     """
     Exibe uma lista de todos os livros.
-    Equivale à função `index` do seu urls.py.
     """
     livros = Livro.objects.all()
     context = {'livros': livros}
     return render(request, 'livros/index.html', context)
 
+
+@permission_required('livros.view_livro', raise_exception=True)
 def livro_detalhe(request, pk):
     """
     Exibe os detalhes de um único livro.
@@ -26,18 +26,10 @@ def livro_detalhe(request, pk):
     user_has_nota = False
     
     if request.user.is_authenticated:
-        # Checa se o usuário tem um perfil associado
-        try:
-            perfil = request.user.perfil
-        except AttributeError:
-            messages.error(request, "Perfil de usuário não encontrado. Por favor, complete seu perfil.")
-            perfil = None
-            
-        if perfil:
-            user_has_nota = NotaDeLeitura.objects.filter(
-                livro=livro,
-                usuario=perfil
-            ).exists()
+        user_has_nota = NotaDeLeitura.objects.filter(
+            livro=livro,
+            usuario=request.user
+        ).exists()
             
     # Obter outras informações
     outros_livros = livro.autor.livros.all().exclude(pk=livro.pk)[:4]
@@ -53,6 +45,7 @@ def livro_detalhe(request, pk):
 
 
 @login_required
+@permission_required('livros.add_livro', raise_exception=True)
 def adicionar_livro(request):
     """
     Permite a criação de um novo livro.
@@ -61,7 +54,7 @@ def adicionar_livro(request):
         form = LivroForm(request.POST)
         if form.is_valid():
             livro = form.save(commit=False)
-            livro.usuario = request.user.perfil
+            livro.usuario = request.user
             livro.save()
             return redirect(reverse('livros:lista_livros'))
     else:
@@ -108,27 +101,18 @@ def deletar_livro(request, pk):
 
 
 @login_required
+@permission_required('livros.add_livro', raise_exception=True)
 def adicionar_a_lista(request, pk):
     livro = get_object_or_404(Livro, pk=pk)
     
-    # Adicionei esta verificação para garantir que o usuário tenha um perfil
-    try:
-        perfil = request.user.perfil
-    except AttributeError:
-        messages.error(request, "Perfil de usuário não encontrado. Por favor, complete seu perfil.")
-        return redirect(request.META.get('HTTP_REFERER', 'livros:lista_livros'))
-    
-    # Verificar se o usuário já tem este livro em sua lista
-    if livro.usuario and livro.usuario == perfil:
+    if livro.usuario and livro.usuario == request.user:
         # Remover da lista
         livro.usuario = None
         livro.lido = False
-        messages.info(request, f'"{livro.titulo}" removido da sua lista.')
     else:
         # Adicionar à lista
-        livro.usuario = perfil
+        livro.usuario = request.user
         livro.lido = False # Define como não lido por padrão ao adicionar
-        messages.success(request, f'"{livro.titulo}" adicionado à sua lista!')
 
     livro.save()
 
@@ -137,15 +121,9 @@ def adicionar_a_lista(request, pk):
 
 
 @login_required
+@permission_required('livros.change_livro', raise_exception=True)
 def marcar_como_lido(request, pk):
     livro = get_object_or_404(Livro, pk=pk)
-
-    # Adicionei esta verificação para garantir que o usuário tenha um perfil
-    try:
-        perfil = request.user.perfil
-    except AttributeError:
-        messages.error(request, "Perfil de usuário não encontrado. Por favor, complete seu perfil.")
-        return redirect('livros:detalhe_livro', pk=livro.pk)
 
     # Redirecionar de volta para a página de detalhes do livro
     return redirect('livros:detalhe_livro', pk=livro.pk)

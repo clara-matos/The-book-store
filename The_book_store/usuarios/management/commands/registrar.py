@@ -72,7 +72,10 @@ class Command(BaseCommand):
                 ('add_notadeleitura', NotaDeLeitura),
                 ('view_notadeleitura', NotaDeLeitura),
                 ('change_notadeleitura', NotaDeLeitura),
-            ],
+                ('change_usuario', Usuario),
+                ('delete_usuario', Usuario),
+                ('view_usuario', Usuario),
+                ],
             'Editores': [
                 ('view_livro', Livro),
                 ('add_livro', Livro),
@@ -108,6 +111,7 @@ class Command(BaseCommand):
                 ('delete_notadeleitura', NotaDeLeitura),
                 ('view_usuario', Usuario),
                 ('change_usuario', Usuario),
+                ('delete_usuario', Usuario),
             ],
         }
 
@@ -290,9 +294,9 @@ class Command(BaseCommand):
             # Altera a atribuição do grupo para usar a ForeignKey 'group'
             user.group = group
             user.save()
-            self.stdout.write(self.style.SUCCESS(f"   - Adicionado ao grupo: {user_data['group']}"))
+            self.stdout.write(self.style.SUCCESS(f"   - Adicionado ao grupo: {user_data['group']}"))
         except Group.DoesNotExist:
-            self.stdout.write(self.style.ERROR(f"   - Grupo '{user_data['group']}' não encontrado."))
+            self.stdout.write(self.style.ERROR(f"   - Grupo '{user_data['group']}' não encontrado."))
         
         return user
     
