@@ -1,0 +1,67 @@
+{% extends '_base.html' %}
+
+{% block title %}Lista de Usuários{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">Lista de Usuários</h1>
+            {% if perms.auth.add_user %}
+            <a href="{% url 'usuarios:registro' %}" class="btn btn-primary rounded-pill">
+                <i class="bi bi-plus-lg me-2"></i>Adicionar Usuário
+            </a>
+            {% endif %}
+        </div>
+
+        {% if usuarios %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for usuario in usuarios %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 d-flex flex-column justify-content-between">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                                {{ usuario.username }}
+                        </h5>
+                        <p class="card-text text-muted">{{ usuario.biografia|default:"Biografia não disponível." }}</p>
+                    </div>
+
+                    {% if perms.usuarios.change_usuarioperfil or perms.usuarios.delete_usuarioperfil %}
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <div class="d-flex gap-2">
+                            {% if perms.usuarios.change_usuarioperfil %}
+                            <a href="{% url 'usuarios:editar_perfil' usuario.pk %}" class="btn btn-sm btn-outline-info rounded-pill flex-fill">Editar</a>
+                            {% endif %}
+                            {% if perms.usuarios.delete_usuarioperfil %}
+                            <a href="{% url 'usuarios:deletar_perfil' usuario.pk %}" class="btn btn-sm btn-outline-danger rounded-pill flex-fill">Excluir</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Nenhum usuário encontrado.
+            {% if perms.auth.add_user %}
+            <a href="{% url 'usuarios:registro' %}" class="alert-link">Cadastre um usuário</a> para começar!
+            {% else %}
+            Entre em contato com um administrador para adicionar usuários.
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+{% endblock %}

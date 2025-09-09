@@ -23,7 +23,6 @@ def genero_detalhe(request, pk):
     return render(request, 'generos/genero_detalhe.html', context)
 
 @login_required
-@permission_required('generos.add_genero', raise_exception=True)
 def adicionar_genero(request):
     """
     Permite a criação de um novo gênero.
@@ -40,7 +39,6 @@ def adicionar_genero(request):
     return render(request, 'generos/genero_form.html', context)
 
 @login_required
-@permission_required('generos.change_genero', raise_exception=True)
 def editar_genero(request, pk):
     """
     Permite a atualização de um gênero existente.
@@ -58,7 +56,6 @@ def editar_genero(request, pk):
     return render(request, 'generos/genero_form.html', context)
 
 @login_required
-@permission_required('generos.delete_genero', raise_exception=True)
 def deletar_genero(request, pk):
     """
     Permite a exclusão de um gênero.

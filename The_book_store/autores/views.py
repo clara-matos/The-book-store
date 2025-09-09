@@ -23,7 +23,6 @@ def autor_detalhe(request, pk):
     return render(request, 'autores/autor_detalhe.html', context)
 
 @login_required
-@permission_required('autores.add_autor', raise_exception=True)
 def adicionar_autor(request):
     """
     Permite a criação de um novo autor.
@@ -40,7 +39,6 @@ def adicionar_autor(request):
     return render(request, 'autores/autor_form.html', context)
 
 @login_required
-@permission_required('autores.change_autor', raise_exception=True)
 def editar_autor(request, pk):
     """
     Permite a atualização de um autor existente.
@@ -58,7 +56,6 @@ def editar_autor(request, pk):
     return render(request, 'autores/autor_form.html', context)
 
 @login_required
-@permission_required('autores.delete_autor', raise_exception=True)
 def deletar_autor(request, pk):
     """
     Permite a exclusão de um autor.

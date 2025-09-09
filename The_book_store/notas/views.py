@@ -70,7 +70,6 @@ def adicionar_nota(request, livro_id):
 
 
 @login_required
-@permission_required('notas.change_notadeleitura', raise_exception=True)
 def editar_nota(request, pk):
     """
     Permite a atualização de uma nota existente.
@@ -100,7 +99,6 @@ def editar_nota(request, pk):
 
 
 @login_required
-@permission_required('notas.delete_notadeleitura', raise_exception=True)
 def deletar_nota(request, pk):
     """
     Permite a exclusão de uma nota.
@@ -124,7 +122,6 @@ def deletar_nota(request, pk):
 
 
 @login_required
-@permission_required('notas.view_notadeleitura', raise_exception=True)
 def nota_list_por_livro(request, livro_id):
     """
     Exibe todas as notas de um livro específico.

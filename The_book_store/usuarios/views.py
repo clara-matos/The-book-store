@@ -84,7 +84,6 @@ def editar_perfil(request):
 
 
 @login_required
-@permission_required('usuario.delete_usuario', raise_exception=True)
 def deletar_perfil(request):
     """
     Permite que o usuário exclua seu próprio perfil.
