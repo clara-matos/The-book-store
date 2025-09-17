@@ -17,11 +17,9 @@
         <div class="d-flex gap-2">
             <a href="{% url 'livros:lista_livros' %}" class="btn btn-outline-primary rounded-pill">Ver Todos</a>
             <a href="{% url 'autores:autor_list' %}" class="btn btn-outline-secondary rounded-pill">Ver Autores</a>
-            {% if user.is_authenticated and perms.livros.add_livro %}
             <a href="{% url 'livros:adicionar_livro' %}" class="btn btn-success rounded-pill">
                 <i class="bi bi-plus-lg me-2"></i>Cadastrar Livro
             </a>
-            {% endif %}
         </div>
     </div>
 

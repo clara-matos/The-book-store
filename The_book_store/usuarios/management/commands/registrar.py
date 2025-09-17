@@ -38,8 +38,8 @@ class Command(BaseCommand):
             with transaction.atomic():
                 self._setup_groups_and_permissions()
                 self._setup_admin_user()
-                self._setup_autores()
                 self._setup_generos()
+                self._setup_autores()
                 self._setup_dev_users()
                 self._setup_livros()
                 self._setup_notas_de_leitura()
@@ -93,25 +93,27 @@ class Command(BaseCommand):
                 ('delete_notadeleitura', NotaDeLeitura),
             ],
             'Administradores': [
-                ('view_livro', Livro),
+                # Permissões para todos os modelos - acesso total
                 ('add_livro', Livro),
                 ('change_livro', Livro),
                 ('delete_livro', Livro),
-                ('view_autor', Autor),
+                ('view_livro', Livro),
                 ('add_autor', Autor),
                 ('change_autor', Autor),
                 ('delete_autor', Autor),
-                ('view_genero', Genero),
+                ('view_autor', Autor),
                 ('add_genero', Genero),
                 ('change_genero', Genero),
                 ('delete_genero', Genero),
-                ('view_notadeleitura', NotaDeLeitura),
+                ('view_genero', Genero),
                 ('add_notadeleitura', NotaDeLeitura),
                 ('change_notadeleitura', NotaDeLeitura),
                 ('delete_notadeleitura', NotaDeLeitura),
-                ('view_usuario', Usuario),
+                ('view_notadeleitura', NotaDeLeitura),
+                ('add_usuario', Usuario),
                 ('change_usuario', Usuario),
                 ('delete_usuario', Usuario),
+                ('view_usuario', Usuario),
             ],
         }
 
@@ -158,41 +160,18 @@ class Command(BaseCommand):
                 password=password,
                 biografia="Administrador do sistema The Book Store"
             )
+            # Adicionar ao grupo Administradores
+            try:
+                admin_group = Group.objects.get(name='Administradores')
+                admin_user.groups.add(admin_group)
+                self.stdout.write(self.style.SUCCESS(f"Admin '{username}' adicionado ao grupo Administradores."))
+            except Group.DoesNotExist:
+                self.stdout.write(self.style.ERROR("Grupo Administradores não encontrado."))
+            
             self.stdout.write(self.style.SUCCESS(f"Admin '{username}' criado com sucesso."))
         else:
             self.stdout.write(self.style.WARNING(f"Admin '{username}' já existe."))
     
-    def _setup_autores(self):
-        """Configura autores iniciais"""
-        self.stdout.write(self.style.SUCCESS("\n--- Criando Autores ---"))
-        
-        autores_data = [
-            {'nome': 'George Orwell', 'pais': 'Reino Unido', 'biografia': 'Escritor e jornalista inglês, conhecido por suas distopias políticas.'},
-            {'nome': 'J.K. Rowling', 'pais': 'Reino Unido', 'biografia': 'Escritora britânica, autora da série Harry Potter.'},
-            {'nome': 'J.R.R. Tolkien', 'pais': 'Reino Unido', 'biografia': 'Escritor, professor e filólogo britânico, autor de O Senhor dos Anéis.'},
-            {'nome': 'Jane Austen', 'pais': 'Reino Unido', 'biografia': 'Romancista britânica considerada uma das maiores escritoras da literatura inglesa.'},
-            {'nome': 'Machado de Assis', 'pais': 'Brasil', 'biografia': 'Escritor brasileiro, widely regarded as the greatest writer of Brazilian literature.'},
-            {'nome': 'Stephen King', 'pais': 'EUA', 'biografia': 'Escritor norte-americano de terror, ficção sobrenatural, suspense e ficção científica.'},
-            {'nome': 'Agatha Christie', 'pais': 'Reino Unido', 'biografia': 'Escritora britânica que se notabilizou no gênero policial.'},
-            {'nome': 'Clarice Lispector', 'pais': 'Brasil', 'biografia': 'Escritora e jornalista brasileira, considerada uma das mais importantes escritoras do século XX.'},
-            {'nome': 'Isaac Asimov', 'pais': 'Rússia/EUA', 'biografia': 'Escritor e bioquímico americano, autor de obras de ficção científica e divulgação científica.'},
-            {'nome': 'Gabriel García Márquez', 'pais': 'Colômbia', 'biografia': 'Escritor, jornalista e ativista político colombiano, laureado com o Nobel de Literatura.'},
-        ]
-        
-        for autor_data in autores_data:
-            autor, created = Autor.objects.get_or_create(
-                nome=autor_data['nome'],
-                defaults={
-                    'pais': autor_data['pais'],
-                    'biografia': autor_data['biografia']
-                }
-            )
-            self.autores[autor.nome] = autor
-            if created:
-                self.stdout.write(self.style.SUCCESS(f"Autor '{autor.nome}' criado com sucesso."))
-            else:
-                self.stdout.write(self.style.WARNING(f"Autor '{autor.nome}' já existe."))
-
     def _setup_generos(self):
         """Configura gêneros literários"""
         self.stdout.write(self.style.SUCCESS("\n--- Criando Gêneros Literários ---"))
@@ -220,6 +199,124 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"Gênero '{genero.nome}' criado com sucesso."))
             else:
                 self.stdout.write(self.style.WARNING(f"Gênero '{genero.nome}' já existe."))
+
+    def _setup_autores(self):
+        """Configura autores iniciais com dados completos"""
+        self.stdout.write(self.style.SUCCESS("\n--- Criando Autores ---"))
+        
+        autores_data = [
+            {
+                'nome': 'George Orwell', 
+                'pais': 'Reino Unido', 
+                'data_nascimento': date(1903, 6, 25),
+                'data_falecimento': date(1950, 1, 21),
+                'biografia': 'Escritor e jornalista inglês, conhecido por suas distopias políticas como "1984" e "A Revolução dos Bichos".',
+                'generos': ['Distopia', 'Ficção Científica', 'Clássico']
+            },
+            {
+                'nome': 'J.K. Rowling', 
+                'pais': 'Reino Unido', 
+                'data_nascimento': date(1965, 7, 31),
+                'data_falecimento': None,
+                'biografia': 'Escritora britânica, autora da série Harry Potter, uma das séries de livros mais vendidas da história.',
+                'generos': ['Fantasia']
+            },
+            {
+                'nome': 'J.R.R. Tolkien', 
+                'pais': 'Reino Unido', 
+                'data_nascimento': date(1892, 1, 3),
+                'data_falecimento': date(1973, 9, 2),
+                'biografia': 'Escritor, professor e filólogo britânico, autor de O Senhor dos Anéis e O Hobbit, considerados marcos da literatura fantástica.',
+                'generos': ['Fantasia', 'Clássico']
+            },
+            {
+                'nome': 'Jane Austen', 
+                'pais': 'Reino Unido', 
+                'data_nascimento': date(1775, 12, 16),
+                'data_falecimento': date(1817, 7, 18),
+                'biografia': 'Romancista britânica considerada uma das maiores escritoras da literatura inglesa, conhecida por suas críticas sociais e romances.',
+                'generos': ['Romance', 'Clássico']
+            },
+            {
+                'nome': 'Machado de Assis', 
+                'pais': 'Brasil', 
+                'data_nascimento': date(1839, 6, 21),
+                'data_falecimento': date(1908, 9, 29),
+                'biografia': 'Escritor brasileiro, considerado o maior nome da literatura nacional. Fundador da Academia Brasileira de Letras.',
+                'generos': ['Literatura Brasileira', 'Clássico', 'Romance']
+            },
+            {
+                'nome': 'Stephen King', 
+                'pais': 'EUA', 
+                'data_nascimento': date(1947, 9, 21),
+                'data_falecimento': None,
+                'biografia': 'Escritor norte-americano de terror, ficção sobrenatural, suspense e ficção científica. Um dos autores mais prolíficos da atualidade.',
+                'generos': ['Terror', 'Suspense', 'Ficção Científica']
+            },
+            {
+                'nome': 'Agatha Christie', 
+                'pais': 'Reino Unido', 
+                'data_nascimento': date(1890, 9, 15),
+                'data_falecimento': date(1976, 1, 12),
+                'biografia': 'Escritora britânica que se notabilizou no gênero policial. Conhecida como "Rainha do Crime".',
+                'generos': ['Mistério', 'Policial']
+            },
+            {
+                'nome': 'Clarice Lispector', 
+                'pais': 'Brasil', 
+                'data_nascimento': date(1920, 12, 10),
+                'data_falecimento': date(1977, 12, 9),
+                'biografia': 'Escritora e jornalista brasileira, considerada uma das mais importantes escritoras do século XX. Sua obra é marcada por inovação estilística.',
+                'generos': ['Literatura Brasileira', 'Romance', 'Conto']
+            },
+            {
+                'nome': 'Isaac Asimov', 
+                'pais': 'Rússia/EUA', 
+                'data_nascimento': date(1920, 1, 2),
+                'data_falecimento': date(1992, 4, 6),
+                'biografia': 'Escritor e bioquímico americano, autor de obras de ficção científica e divulgação científica. Criador das Três Leis da Robótica.',
+                'generos': ['Ficção Científica']
+            },
+            {
+                'nome': 'Gabriel García Márquez', 
+                'pais': 'Colômbia', 
+                'data_nascimento': date(1927, 3, 6),
+                'data_falecimento': date(2014, 4, 17),
+                'biografia': 'Escritor, jornalista e ativista político colombiano, laureado com o Nobel de Literatura. Principal expoente do realismo mágico.',
+                'generos': ['Realismo Mágico', 'Romance']
+            },
+        ]
+        
+        for autor_data in autores_data:
+            autor, created = Autor.objects.get_or_create(
+                nome=autor_data['nome'],
+                defaults={
+                    'pais': autor_data['pais'],
+                    'data_nascimento': autor_data['data_nascimento'],
+                    'data_falecimento': autor_data['data_falecimento'],
+                    'biografia': autor_data['biografia']
+                }
+            )
+            
+            # Adicionar gêneros literários ao autor
+            for genero_nome in autor_data['generos']:
+                if genero_nome in self.generos:
+                    autor.generos.add(self.generos[genero_nome])
+                else:
+                    # Se o gênero não existir na lista padrão, criar
+                    genero, created = Genero.objects.get_or_create(
+                        nome=genero_nome,
+                        defaults={'descricao': f'Obras do gênero {genero_nome}'}
+                    )
+                    self.generos[genero_nome] = genero
+                    autor.generos.add(genero)
+            
+            self.autores[autor.nome] = autor
+            if created:
+                self.stdout.write(self.style.SUCCESS(f"Autor '{autor.nome}' criado com sucesso."))
+                self.stdout.write(self.style.SUCCESS(f"   - Gêneros: {', '.join(autor_data['generos'])}"))
+            else:
+                self.stdout.write(self.style.WARNING(f"Autor '{autor.nome}' já existe."))
 
     def _setup_dev_users(self):
         """Configura usuários de desenvolvimento"""
@@ -291,12 +388,10 @@ class Command(BaseCommand):
         
         try:
             group = Group.objects.get(name=user_data['group'])
-            # Altera a atribuição do grupo para usar a ForeignKey 'group'
-            user.group = group
-            user.save()
-            self.stdout.write(self.style.SUCCESS(f"   - Adicionado ao grupo: {user_data['group']}"))
+            user.groups.add(group)
+            self.stdout.write(self.style.SUCCESS(f"   - Adicionado ao grupo: {user_data['group']}"))
         except Group.DoesNotExist:
-            self.stdout.write(self.style.ERROR(f"   - Grupo '{user_data['group']}' não encontrado."))
+            self.stdout.write(self.style.ERROR(f"   - Grupo '{user_data['group']}' não encontrado."))
         
         return user
     
@@ -369,7 +464,7 @@ class Command(BaseCommand):
         
         self.livros = {}
         for livro_data in livros_data:
-            # Acessa diretamente a instância do usuário, sem o .perfil
+            # Agora usando o relacionamento ForeignKey com Usuario
             usuario = self.users['leitor1'] if livro_data['lido'] else None
             livro, created = Livro.objects.get_or_create(
                 titulo=livro_data['titulo'],
@@ -377,7 +472,7 @@ class Command(BaseCommand):
                 defaults={
                     'genero': livro_data['genero'],
                     'lido': livro_data['lido'],
-                    'usuario': usuario
+                    'usuario': usuario  # Agora é uma ForeignKey direta
                 }
             )
             self.livros[livro.titulo] = livro

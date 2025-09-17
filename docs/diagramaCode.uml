@@ -52,8 +52,8 @@ class NotaDeLeitura {
 ' ========================
 ' Relacionamentos
 ' ========================
-' Herança e Relações 1:1
-Usuario "1" -- "1" User : user (OneToOneField)
+' Herança
+Usuario <|-- User
 
 ' Relacionamentos 1:N (ForeignKey)
 Livro "0..n" -- "1" Autor
@@ -63,6 +63,6 @@ NotaDeLeitura "0..n" -- "1" Livro
 NotaDeLeitura "0..n" -- "1" Usuario
 
 ' Relacionamentos N:N (ManyToManyField)
-Autor "0..n" -- "0..n" Genero
+Autor "0..n" -- "0..n" Genero
 
 @enduml
