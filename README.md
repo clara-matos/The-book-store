@@ -1,3 +1,5 @@
+[Assista ao vídeo no YouTube] ( https://youtu.be/ExhtPvTI4RQ?feature=shared)
+
 # 📖 The Book Store
 
 ## 📌 Sobre o Projeto
